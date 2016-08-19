@@ -74,26 +74,5 @@ public class CrawlSiteMultiThreaded extends TestBase {
             System.out.println("URLs to visit (remaing futures): " + futures.size());
             Thread.sleep(100);
         }
-
-//        toCrawlList.add(initialUrl);
-//        while(!toCrawlList.isEmpty()) {
-//            System.out.println("URLs to visit: " + toCrawlList.size());
-//            System.out.println("Visited URLs: " + crawledList.size());
-//            String url = toCrawlList.poll();
-//            try {
-//                List<String> newUrls = crawl(url);
-//                crawledList.add(url);
-//                for(String newUrl : newUrls) {
-//                    if (!toCrawlList.contains(newUrl) && !crawledList.contains(newUrl) && newUrl.contains(initialUrl)) {
-//                        System.out.println("New URL found: " + newUrl);
-//                        toCrawlList.add(newUrl);
-//                        WriteToFile.writeOutput(validUrlsOutFile, "\n[" + lineNumber + "] " + newUrl);
-//                        lineNumber++;
-//                    }
-//                }
-//            } catch (Exception e) {
-//                System.out.println("Error: " + e.getMessage());
-//            }
-//        }
     }
 }

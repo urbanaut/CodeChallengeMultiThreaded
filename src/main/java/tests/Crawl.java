@@ -30,42 +30,39 @@ public class Crawl extends TestBase implements Callable {
 
     @Override
     public List<String> call() {
-
         if (showInBrowser) {
             driver.navigate().to(url);
         }
 
         List<String> newUrls = new ArrayList<>();
-
         try {
             Document doc = Jsoup.connect(url).userAgent("Chrome").get();
             Elements anchors = doc.select("a");
 
-
-        for (Element anchor : anchors) {
-            String discoveredUrl = anchor.attr("abs:href").toLowerCase();
-            if (discoveredUrl.length() > 1
-                    && !discoveredUrl.contains("@@")
-                    && !discoveredUrl.contains("&")
-                    && !discoveredUrl.contains("?")
-                    && !discoveredUrl.contains("..")
-                    && !discoveredUrl.contains(",")
-                    && !discoveredUrl.contains("mobile")) {
-                newUrls.add(discoveredUrl);
+            for (Element anchor : anchors) {
+                String discoveredUrl = anchor.attr("abs:href").toLowerCase();
+                if (discoveredUrl.length() > 1
+                        && !discoveredUrl.contains("@@")
+                        && !discoveredUrl.contains("&")
+                        && !discoveredUrl.contains("?")
+                        && !discoveredUrl.contains("..")
+                        && !discoveredUrl.contains(",")
+                        && !discoveredUrl.contains("mobile")) {
+                    newUrls.add(discoveredUrl);
+                }
             }
-        }
 
-        if (getPageText) {
-            System.out.println("Extracting page text...");
-            String pageText = doc.body().text();
-            pageText.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
-            WriteToFile.writeOutput(extractedTextOutFile, "\n" + pageText + "\n");
-        }
+            if (getPageText) {
+                System.out.println("Extracting page text...");
+                String pageText = doc.body().text();
+                pageText.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
+                WriteToFile.writeOutput(extractedTextOutFile, "\n" + pageText + "\n");
+            }
 
-        if (checkImages) {
-            System.out.print("Checking for broken images...");
-            FindBrokenImages.checkImageLinks(url);
-        }
+            if (checkImages) {
+                System.out.print("Checking for broken images...");
+                FindBrokenImages.checkImageLinks(url);
+            }
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }

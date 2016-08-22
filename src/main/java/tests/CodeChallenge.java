@@ -17,7 +17,8 @@ public class CodeChallenge extends TestBase {
     private static String searchWhat = "Ski School";
     private static String searchByResort = "Brighton";
     private static String searchSubCategory = "Family and Kids";
-    private static boolean text, images;
+    static boolean text = false;
+    static boolean images = false;
 
     @Test
     public static void runAutomation() throws InterruptedException {
@@ -48,9 +49,7 @@ public class CodeChallenge extends TestBase {
         //// Challenge #8: Find all page's broken images
             // Use CrawlerOption IMAGES
 
-        text = Boolean.parseBoolean(CrawlerOptions.selectCrawlerOption(option).get(0));
-        images = Boolean.parseBoolean(CrawlerOptions.selectCrawlerOption(option).get(1));
-        CrawlSiteMultiThreaded.startCrawl(text, images);
+        CrawlSiteMultiThreaded.startCrawl();
 
     }
 }

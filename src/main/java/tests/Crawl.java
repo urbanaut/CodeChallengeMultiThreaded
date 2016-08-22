@@ -1,13 +1,16 @@
 package tests;
 
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import util.FindBrokenImages;
+import util.ScrapePageText;
 import util.TestBase;
 import util.WriteToFile;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -18,27 +21,31 @@ import java.util.concurrent.Callable;
 public class Crawl extends TestBase implements Callable {
 
     private static boolean showInBrowser = false;
-    private static boolean getPageText;
-    private static boolean checkImages;
-
-    private static String extractedTextOutFile = "dictionary_" + getDateTime() + ".txt";
+    private static boolean logging = false;
+    private static boolean getPageText = CodeChallenge.text;
+    private static boolean checkImages = CodeChallenge.images;
+    private static String error404LogFile = "src/main/resources/LogFiles/Error404/error404_" + getDateTime() + ".txt";
+    private static String timeOutLogFile = "src/main/resources/LogFiles/TimeOuts/timeOut_" + getDateTime() + ".txt";
     private String url;
 
-    public Crawl(String url) {
+    Crawl(String url) {
         this.url = url;
     }
 
     @Override
-    public List<String> call() {
+    public List<String> call() throws Exception {
         if (showInBrowser) {
             driver.navigate().to(url);
         }
 
         List<String> newUrls = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect(url).userAgent("Chrome").get();
+            Document doc = Jsoup.connect(url)
+                    .timeout(4000)
+                    .ignoreContentType(true)
+                    .userAgent("Chrome")
+                    .get();
             Elements anchors = doc.select("a");
-
             for (Element anchor : anchors) {
                 String discoveredUrl = anchor.attr("abs:href").toLowerCase();
                 if (discoveredUrl.length() > 1
@@ -51,20 +58,24 @@ public class Crawl extends TestBase implements Callable {
                     newUrls.add(discoveredUrl);
                 }
             }
-
             if (getPageText) {
-                System.out.println("Extracting page text...");
-                String pageText = doc.body().text();
-                pageText.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
-                WriteToFile.writeOutput(extractedTextOutFile, "\n" + pageText + "\n");
+                ScrapePageText.scrape(doc);
             }
-
             if (checkImages) {
-                System.out.print("Checking for broken images...");
                 FindBrokenImages.checkImageLinks(url);
             }
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+        }
+        catch (HttpStatusException e1) {
+            System.err.println("Page not available, 404 error.");
+            if (logging) WriteToFile.writeOutput(error404LogFile, "\n" + url);
+        }
+        catch (SocketTimeoutException e2) {
+            System.err.println("SocketTimeoutException caught, error: " + e2.getLocalizedMessage());
+            if (logging) WriteToFile.writeOutput(timeOutLogFile, "\n" + url);
+        }
+        catch (Exception e3) {
+            System.err.println("Error: " + e3.getMessage());
+            e3.printStackTrace();
         }
         return newUrls;
     }

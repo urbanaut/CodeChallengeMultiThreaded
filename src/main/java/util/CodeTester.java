@@ -6,6 +6,8 @@ import java.util.Stack;
 
 public class CodeTester {
 
+    // TODO: Move this class to it's own project for testing code
+
     private static Stack<Integer> toCrawlList = new Stack<Integer>();
 
     @Test

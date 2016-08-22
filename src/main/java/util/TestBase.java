@@ -22,7 +22,7 @@ public class TestBase {
     protected static Actions action;
     protected static JavascriptExecutor jsEx;
     protected static WebDriverWait wait;
-    private static String driverPath = "src\\main\\resources\\drivers\\chromedriver.exe";
+    private static String driverPath = "src/main/resources/drivers/chromedriver.exe";
 
 
     @BeforeClass
